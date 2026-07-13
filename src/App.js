@@ -137,7 +137,7 @@ function App() {
       <div className="app">
         <div className="sidebar">
           <div className="logo">
-            <h2> QuickTask</h2>
+            <h2> TodoList</h2>
           </div>
         </div>
         <div className="main-content">
@@ -152,7 +152,7 @@ function App() {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="logo">
-          <h2> QuickTask</h2>
+          <h2> TodoList</h2>
         </div>
         
         <nav className="nav-menu">
