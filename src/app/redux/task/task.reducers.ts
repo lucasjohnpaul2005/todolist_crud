@@ -1,6 +1,15 @@
 import * as types from './task.types';
+import { Task } from '../../../domain/entities/Task';
 
-const initialState = {
+interface TaskState {
+  tasks: Task[];
+  activeTab: 'work' | 'personal' | 'completed' | 'settings';
+  isLoading: boolean;
+  error: string | null;
+  repositoryType: 'localStorage' | 'inMemory';
+}
+
+const initialState: TaskState = {
   tasks: [],
   activeTab: 'personal',
   isLoading: false,
@@ -8,9 +17,13 @@ const initialState = {
   repositoryType: 'localStorage',
 };
 
-const taskReducer = (state = initialState, action) => {
+interface Action {
+  type: string;
+  payload?: any;
+}
+
+const taskReducer = (state: TaskState = initialState, action: Action): TaskState => {
   switch (action.type) {
-    // CRUD Operations
     case types.CREATE_TASK:
       return { ...state, tasks: [...state.tasks, action.payload] };
     
@@ -18,7 +31,7 @@ const taskReducer = (state = initialState, action) => {
       return { ...state, tasks: action.payload };
     
     case types.UPDATE_TASK:
-      const updateIndex = state.tasks.findIndex(t => t.id === action.payload.id);
+      const updateIndex = state.tasks.findIndex(t => t.id === action.payload?.id);
       if (updateIndex !== -1) {
         const newTasks = [...state.tasks];
         newTasks[updateIndex] = action.payload;
@@ -29,7 +42,6 @@ const taskReducer = (state = initialState, action) => {
     case types.DELETE_TASK:
       return { ...state, tasks: state.tasks.filter(t => t.id !== action.payload) };
     
-    // UI State
     case types.SET_LOADING:
       return { ...state, isLoading: action.payload };
     

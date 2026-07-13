@@ -15,14 +15,14 @@ function App() {
   const { tasks, activeTab, isLoading, error, repositoryType } = useAppSelector((state) => state.tasks);
   
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingTodo, setEditingTodo] = useState(null);
+  const [editingTodo, setEditingTodo] = useState<any>(null);
   const [editText, setEditText] = useState('');
   const [editWorkLocation, setEditWorkLocation] = useState('');
   const [editDueDate, setEditDueDate] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newText, setNewText] = useState('');
-  const [newCategory, setNewCategory] = useState('Personal');
-  const [newWorkLocation, setNewWorkLocation] = useState('Work from Home');
+  const [newCategory, setNewCategory] = useState<'Work' | 'Personal'>('Personal');
+  const [newWorkLocation, setNewWorkLocation] = useState<'Work from Home' | 'Work from Company'>('Work from Home');
   const [newDueDate, setNewDueDate] = useState('');
 
   // Load tasks on mount - READ operation
@@ -32,13 +32,13 @@ function App() {
 
   const getFilteredTodos = () => {
     if (activeTab === 'work') {
-      return tasks.filter(t => t.category === 'Work' && !t.completed);
+      return tasks.filter((t: any) => t.category === 'Work' && !t.completed);
     } else if (activeTab === 'personal') {
-      return tasks.filter(t => t.category === 'Personal' && !t.completed);
+      return tasks.filter((t: any) => t.category === 'Personal' && !t.completed);
     } else if (activeTab === 'completed') {
-      return tasks.filter(t => t.completed);
+      return tasks.filter((t: any) => t.completed);
     }
-    return tasks.filter(t => !t.completed);
+    return tasks.filter((t: any) => !t.completed);
   };
 
   // CREATE operation
@@ -48,7 +48,7 @@ function App() {
         title: newText.trim(),
         category: newCategory,
         dueDate: newDueDate || new Date().toISOString().split('T')[0],
-        workLocation: newCategory === 'Work' ? newWorkLocation : null,
+        workLocation: newCategory === 'Work' ? newWorkLocation : undefined,
       }));
       setNewText('');
       setNewCategory('Personal');
@@ -59,14 +59,14 @@ function App() {
   };
 
   // UPDATE operation - toggle complete
-  const handleToggleComplete = (id) => {
-    const task = tasks.find(t => t.id === id);
+  const handleToggleComplete = (id: number) => {
+    const task = tasks.find((t: any) => t.id === id);
     if (task) {
       dispatch(updateTask(id, { completed: !task.completed }));
     }
   };
 
-  const openEditModal = (todo) => {
+  const openEditModal = (todo: any) => {
     setEditingTodo(todo);
     setEditText(todo.title);
     setEditDueDate(todo.dueDate);
@@ -79,7 +79,7 @@ function App() {
   // UPDATE operation - edit task
   const handleSaveEdit = () => {
     if (editText.trim()) {
-      const updates = {
+      const updates: any = {
         title: editText.trim(),
         dueDate: editDueDate,
       };
@@ -92,13 +92,13 @@ function App() {
     }
   };
 
-  //  DELETE operation - with company task protection
-  const handleDeleteTodo = (id) => {
-    const task = tasks.find(t => t.id === id);
+  // DELETE operation - with company task protection
+  const handleDeleteTodo = (id: number) => {
+    const task = tasks.find((t: any) => t.id === id);
     
     // Prevent deletion of "Work from Company" tasks
     if (task && task.workLocation === 'Work from Company') {
-      alert('Dili Pwede e Delete ang Company tasks!');
+      alert('❌ Cannot delete Company tasks! Only Work from Home tasks can be deleted.');
       return;
     }
     
@@ -107,28 +107,27 @@ function App() {
     }
   };
 
-  //  Clear All - with company task protection
   const handleClearAll = () => {
     // Check if there are any company tasks
-    const hasCompanyTasks = tasks.some(t => t.workLocation === 'Work from Company');
+    const hasCompanyTasks = tasks.some((t: any) => t.workLocation === 'Work from Company');
     
     if (hasCompanyTasks) {
-      alert('Cannot delete all tasks. Company tasks cannot be deleted.');
+      alert('❌ Cannot delete all tasks. Company tasks cannot be deleted.');
       return;
     }
     
     if (window.confirm('Delete all tasks?')) {
-      tasks.forEach(task => {
+      tasks.forEach((task: any) => {
         dispatch(deleteTask(task.id));
       });
     }
   };
 
-  const handleSwitchRepository = (type) => {
+  const handleSwitchRepository = (type: 'localStorage' | 'inMemory') => {
     dispatch(switchRepository(type));
   };
 
-  const getWorkLocationColor = (location) => {
+  const getWorkLocationColor = (location: string) => {
     switch(location) {
       case 'Work from Home': return '#10b981';
       case 'Work from Company': return '#3b82f6';
@@ -136,13 +135,13 @@ function App() {
     }
   };
 
-  const getCategoryCount = (category) => {
-    return tasks.filter(t => t.category === category && !t.completed).length;
+  const getCategoryCount = (category: 'Work' | 'Personal') => {
+    return tasks.filter((t: any) => t.category === category && !t.completed).length;
   };
 
   const filteredTodos = getFilteredTodos();
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return 'No date';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -193,7 +192,7 @@ function App() {
             onClick={() => dispatch(setActiveTab('completed'))}
           >
             <span className="nav-text">Completed</span>
-            <span className="nav-count">{tasks.filter(t => t.completed).length}</span>
+            <span className="nav-count">{tasks.filter((t: any) => t.completed).length}</span>
           </button>
           
           <button 
@@ -228,7 +227,7 @@ function App() {
                   <button onClick={() => setShowAddForm(true)} className="empty-add-btn">+ Add your first task</button>
                 </div>
               ) : (
-                filteredTodos.map(task => (
+                filteredTodos.map((task: any) => (
                   <div key={task.id} className="task-card">
                     <div className="task-header">
                       <input
@@ -273,13 +272,21 @@ function App() {
                   autoFocus
                 />
                 
-                <select value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className="add-select">
+                <select 
+                  value={newCategory} 
+                  onChange={(e) => setNewCategory(e.target.value as 'Work' | 'Personal')} 
+                  className="add-select"
+                >
                   <option value="Work"> Work</option>
                   <option value="Personal"> Personal</option>
                 </select>
                 
                 {newCategory === 'Work' && (
-                  <select value={newWorkLocation} onChange={(e) => setNewWorkLocation(e.target.value)} className="add-select">
+                  <select 
+                    value={newWorkLocation} 
+                    onChange={(e) => setNewWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')} 
+                    className="add-select"
+                  >
                     <option value="Work from Home"> Work from Home</option>
                     <option value="Work from Company"> Work from Company</option>
                   </select>
@@ -337,19 +344,19 @@ function App() {
                   <div className="stat-label">Total Tasks</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-number">{tasks.filter(t => t.completed).length}</div>
+                  <div className="stat-number">{tasks.filter((t: any) => t.completed).length}</div>
                   <div className="stat-label">Completed</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-number">{tasks.filter(t => !t.completed).length}</div>
+                  <div className="stat-number">{tasks.filter((t: any) => !t.completed).length}</div>
                   <div className="stat-label">Pending</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-number">{tasks.filter(t => t.category === 'Work' && !t.completed).length}</div>
+                  <div className="stat-number">{tasks.filter((t: any) => t.category === 'Work' && !t.completed).length}</div>
                   <div className="stat-label">Work Tasks</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-number">{tasks.filter(t => t.category === 'Personal' && !t.completed).length}</div>
+                  <div className="stat-number">{tasks.filter((t: any) => t.category === 'Personal' && !t.completed).length}</div>
                   <div className="stat-label">Personal Tasks</div>
                 </div>
               </div>
@@ -376,7 +383,11 @@ function App() {
             {editingTodo && editingTodo.category === 'Work' && (
               <div className="modal-field">
                 <label>Work Location</label>
-                <select value={editWorkLocation} onChange={(e) => setEditWorkLocation(e.target.value)} className="modal-select">
+                <select 
+                  value={editWorkLocation} 
+                  onChange={(e) => setEditWorkLocation(e.target.value)} 
+                  className="modal-select"
+                >
                   <option value="Work from Home"> Work from Home</option>
                   <option value="Work from Company"> Work from Company</option>
                 </select>

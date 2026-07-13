@@ -1,21 +1,19 @@
-export class UpdateTaskUseCase {
-  /**
-   * @param {TaskRepository} taskRepository - Must implement TaskRepository interface
-   */
-  constructor(taskRepository) {
-    this.taskRepository = taskRepository;
-  }
+import { TaskRepository } from '../repositories/TaskRepository';
+import { Task } from '../entities/Task';
 
-  execute(id, updates) {
-    const task = this.taskRepository.getTask(id);
+export class UpdateTaskUseCase {
+  constructor(private taskRepository: TaskRepository) {}
+
+  async execute(id: number, updates: Partial<Omit<Task, 'id'>>): Promise<Task | undefined> {
+    const task = await this.taskRepository.getTask(id);
     if (!task) {
       throw new Error(`Task with id ${id} not found`);
     }
 
-    const cleanUpdates = {};
+    const cleanUpdates: Partial<Omit<Task, 'id'>> = {};
     
     if (updates.title !== undefined) {
-      if (!updates.title.trim()) throw new Error('Task title cannot be empty');
+      if (!updates.title?.trim()) throw new Error('Task title cannot be empty');
       cleanUpdates.title = updates.title.trim();
     }
     

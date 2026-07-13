@@ -1,13 +1,20 @@
 import * as types from './task.types';
 import { TaskService } from '../../TaskService';
+import { Task } from '../../../domain/entities/Task';
+import { AppDispatch } from '../store';
 
 const taskService = new TaskService('localStorage');
 
-// CRUD Actions (4 main actions)
-export const createTask = (taskData) => async (dispatch) => {
+// CRUD Actions
+export const createTask = (taskData: { 
+  title: string; 
+  category: 'Work' | 'Personal'; 
+  dueDate: string; 
+  workLocation?: 'Work from Home' | 'Work from Company' 
+}) => async (dispatch: AppDispatch) => {
   dispatch({ type: types.SET_LOADING, payload: true });
   try {
-    const newTask = taskService.addTask(
+    const newTask = await taskService.addTask(
       taskData.title,
       taskData.category,
       taskData.dueDate,
@@ -15,62 +22,61 @@ export const createTask = (taskData) => async (dispatch) => {
     );
     dispatch({ type: types.CREATE_TASK, payload: newTask });
     dispatch({ type: types.SET_ERROR, payload: null });
-  } catch (error) {
+  } catch (error: any) {
     dispatch({ type: types.SET_ERROR, payload: error.message });
   }
   dispatch({ type: types.SET_LOADING, payload: false });
 };
 
-export const readTasks = () => async (dispatch) => {
+export const readTasks = () => async (dispatch: AppDispatch) => {
   dispatch({ type: types.SET_LOADING, payload: true });
   try {
-    const tasks = taskService.getAllTasks();
+    const tasks = await taskService.getAllTasks();
     dispatch({ type: types.READ_TASKS, payload: tasks });
     dispatch({ type: types.SET_ERROR, payload: null });
-  } catch (error) {
+  } catch (error: any) {
     dispatch({ type: types.SET_ERROR, payload: error.message });
   }
   dispatch({ type: types.SET_LOADING, payload: false });
 };
 
-export const updateTask = (id, updates) => async (dispatch) => {
+export const updateTask = (id: number, updates: Partial<Omit<Task, 'id'>>) => async (dispatch: AppDispatch) => {
   dispatch({ type: types.SET_LOADING, payload: true });
   try {
-    const updated = taskService.updateTask(id, updates);
+    const updated = await taskService.updateTask(id, updates);
     dispatch({ type: types.UPDATE_TASK, payload: updated });
     dispatch({ type: types.SET_ERROR, payload: null });
-  } catch (error) {
+  } catch (error: any) {
     dispatch({ type: types.SET_ERROR, payload: error.message });
   }
   dispatch({ type: types.SET_LOADING, payload: false });
 };
 
-export const deleteTask = (id) => async (dispatch) => {
+export const deleteTask = (id: number) => async (dispatch: AppDispatch) => {
   dispatch({ type: types.SET_LOADING, payload: true });
   try {
-    taskService.removeTask(id);
+    await taskService.removeTask(id);
     dispatch({ type: types.DELETE_TASK, payload: id });
     dispatch({ type: types.SET_ERROR, payload: null });
-  } catch (error) {
+  } catch (error: any) {
     dispatch({ type: types.SET_ERROR, payload: error.message });
   }
   dispatch({ type: types.SET_LOADING, payload: false });
 };
 
-// UI Actions (not part of CRUD)
-export const setActiveTab = (tab) => ({
+export const switchRepository = (type: 'localStorage' | 'inMemory') => async (dispatch: AppDispatch) => {
+  dispatch({ type: types.SET_LOADING, payload: true });
+  try {
+    const tasks = await taskService.switchRepository(type);
+    dispatch({ type: types.SWITCH_REPOSITORY, payload: { tasks, type } });
+    dispatch({ type: types.SET_ERROR, payload: null });
+  } catch (error: any) {
+    dispatch({ type: types.SET_ERROR, payload: error.message });
+  }
+  dispatch({ type: types.SET_LOADING, payload: false });
+};
+
+export const setActiveTab = (tab: 'work' | 'personal' | 'completed' | 'settings') => ({
   type: types.SET_ACTIVE_TAB,
   payload: tab,
 });
-
-export const switchRepository = (type) => async (dispatch) => {
-  dispatch({ type: types.SET_LOADING, payload: true });
-  try {
-    const tasks = taskService.switchRepository(type);
-    dispatch({ type: types.SWITCH_REPOSITORY, payload: { tasks, type } });
-    dispatch({ type: types.SET_ERROR, payload: null });
-  } catch (error) {
-    dispatch({ type: types.SET_ERROR, payload: error.message });
-  }
-  dispatch({ type: types.SET_LOADING, payload: false });
-};

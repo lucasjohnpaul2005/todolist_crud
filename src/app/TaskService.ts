@@ -1,3 +1,5 @@
+import { Task } from '../domain/entities/Task';
+import { TaskRepository } from '../domain/repositories/TaskRepository';
 import { AddTaskUseCase } from '../domain/use-cases/AddTaskUseCase';
 import { RemoveTaskUseCase } from '../domain/use-cases/RemoveTaskUseCase';
 import { UpdateTaskUseCase } from '../domain/use-cases/UpdateTaskUseCase';
@@ -7,13 +9,18 @@ import { ClearAllTasksUseCase } from '../domain/use-cases/ClearAllTasksUseCase';
 import { LocalStorageTaskRepository } from '../data/repositories/LocalStorageTaskRepository';
 import { InMemoryTaskRepository } from '../data/repositories/InMemoryTaskRepository';
 
+export type RepositoryType = 'localStorage' | 'inMemory';
+
 export class TaskService {
-  constructor(repositoryType = 'localStorage') {
+  private repository!: TaskRepository;  // ✅ Should work if import is correct
+  private repositoryType: RepositoryType;
+
+  constructor(repositoryType: RepositoryType = 'localStorage') {
     this.repositoryType = repositoryType;
     this.setRepository(repositoryType);
   }
 
-  setRepository(type) {
+  setRepository(type: RepositoryType): void {
     this.repositoryType = type;
     if (type === 'inMemory') {
       this.repository = new InMemoryTaskRepository();
@@ -22,54 +29,45 @@ export class TaskService {
     }
   }
 
-  addTask(title, category, dueDate, workLocation) {
+  async addTask(
+    title: string,
+    category: 'Work' | 'Personal',
+    dueDate: string,
+    workLocation?: 'Work from Home' | 'Work from Company'
+  ): Promise<Task> {
     const useCase = new AddTaskUseCase(this.repository);
-    const task = useCase.execute(title, category, dueDate, workLocation);
-    return task;
+    return useCase.execute(title, category, dueDate, workLocation);
   }
 
-  removeTask(id) {
+  async removeTask(id: number): Promise<boolean> {
     const useCase = new RemoveTaskUseCase(this.repository);
     return useCase.execute(id);
   }
 
-  updateTask(id, updates) {
+  async updateTask(
+    id: number,
+    updates: Partial<Omit<Task, 'id'>>
+  ): Promise<Task | undefined> {
     const useCase = new UpdateTaskUseCase(this.repository);
     return useCase.execute(id, updates);
   }
 
-  getAllTasks() {
+  async getAllTasks(): Promise<Task[]> {
     const useCase = new GetAllTasksUseCase(this.repository);
-    const tasks = useCase.execute();
-    return tasks;
+    return useCase.execute();
   }
 
-  getTask(id) {
+  async getTask(id: number): Promise<Task | undefined> {
     const useCase = new GetTaskUseCase(this.repository);
     return useCase.execute(id);
   }
 
-  getTasksByCategory(category) {
-    const useCase = new GetAllTasksUseCase(this.repository);
-    return useCase.getByCategory(category);
-  }
-
-  getCompletedTasks() {
-    const useCase = new GetAllTasksUseCase(this.repository);
-    return useCase.getCompleted();
-  }
-
-  getPendingTasks() {
-    const useCase = new GetAllTasksUseCase(this.repository);
-    return useCase.getPending();
-  }
-
-  clearAllTasks() {
+  async clearAllTasks(): Promise<void> {
     const useCase = new ClearAllTasksUseCase(this.repository);
     return useCase.execute();
   }
 
-  switchRepository(type) {
+  async switchRepository(type: RepositoryType): Promise<Task[]> {
     this.setRepository(type);
     return this.getAllTasks();
   }
