@@ -1,4 +1,7 @@
 export class UpdateTaskUseCase {
+  /**
+   * @param {TaskRepository} taskRepository - Must implement TaskRepository interface
+   */
   constructor(taskRepository) {
     this.taskRepository = taskRepository;
   }
@@ -12,23 +15,17 @@ export class UpdateTaskUseCase {
     const cleanUpdates = {};
     
     if (updates.title !== undefined) {
-      if (!updates.title.trim()) {
-        throw new Error('Task title cannot be empty');
-      }
+      if (!updates.title.trim()) throw new Error('Task title cannot be empty');
       cleanUpdates.title = updates.title.trim();
     }
     
     if (updates.dueDate !== undefined) {
-      if (!updates.dueDate) {
-        throw new Error('Due date cannot be empty');
-      }
+      if (!updates.dueDate) throw new Error('Due date cannot be empty');
       cleanUpdates.dueDate = updates.dueDate;
     }
     
     if (updates.workLocation !== undefined) {
-      if (task.category !== 'Work') {
-        throw new Error('Work location can only be set for Work tasks');
-      }
+      if (task.category !== 'Work') throw new Error('Work location only for Work tasks');
       cleanUpdates.workLocation = updates.workLocation;
     }
     

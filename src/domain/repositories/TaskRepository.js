@@ -1,11 +1,31 @@
+/**
+ * Task Repository Interface
+ * This defines the contract that all concrete repositories must follow
+ * This should be an interface/abstract class, NOT a concrete implementation
+ */
 export class TaskRepository {
-  // Interface methods
-  addTask(task) { throw new Error('Not implemented'); }
-  removeTask(id) { throw new Error('Not implemented'); }
-  updateTask(id, updates) { throw new Error('Not implemented'); }
-  getAllTasks() { throw new Error('Not implemented'); }
-  getTask(id) { throw new Error('Not implemented'); }
-  getTasksByCategory(category) { throw new Error('Not implemented'); }
-  getCompletedTasks() { throw new Error('Not implemented'); }
-  clearAll() { throw new Error('Not implemented'); }
+  // These are abstract methods - they should be implemented by concrete repositories
+  addTask(task) {
+    throw new Error('Method not implemented');
+  }
+
+  removeTask(id) {
+    throw new Error('Method not implemented');
+  }
+
+  updateTask(id, updates) {
+    throw new Error('Method not implemented');
+  }
+
+  getAllTasks() {
+    throw new Error('Method not implemented');
+  }
+
+  getTask(id) {
+    throw new Error('Method not implemented');
+  }
+
+  clearAll() {
+    throw new Error('Method not implemented');
+  }
 }

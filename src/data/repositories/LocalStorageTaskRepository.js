@@ -1,28 +1,33 @@
 import { TaskRepository } from '../../domain/repositories/TaskRepository';
 import { Task } from '../../domain/entities/Task';
 
+/**
+ * Concrete implementation of TaskRepository
+ * Handles all data fetching and storage
+ */
 export class LocalStorageTaskRepository extends TaskRepository {
   constructor() {
     super();
     this.STORAGE_KEY = 'todos';
   }
 
+  // Private methods for data persistence
   loadFromStorage() {
     const saved = localStorage.getItem(this.STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
   }
 
   saveToStorage(data) {
-    // Convert Task objects to plain objects before saving
     const plainData = data.map(item => {
       if (item.toJSON) {
         return item.toJSON();
       }
-      return item; // Already plain object
+      return item;
     });
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(plainData));
   }
 
+  // Public methods - these implement the interface
   getAllTasks() {
     const data = this.loadFromStorage();
     return data.map(item => Task.fromJSON(item));
@@ -55,14 +60,6 @@ export class LocalStorageTaskRepository extends TaskRepository {
       return updatedTask;
     }
     return null;
-  }
-
-  getTasksByCategory(category) {
-    return this.getAllTasks().filter(t => t.category === category && !t.completed);
-  }
-
-  getCompletedTasks() {
-    return this.getAllTasks().filter(t => t.completed);
   }
 
   clearAll() {

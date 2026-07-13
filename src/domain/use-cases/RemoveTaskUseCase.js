@@ -1,4 +1,7 @@
 export class RemoveTaskUseCase {
+  /**
+   * @param {TaskRepository} taskRepository - Must implement TaskRepository interface
+   */
   constructor(taskRepository) {
     this.taskRepository = taskRepository;
   }

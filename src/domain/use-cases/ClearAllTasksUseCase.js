@@ -1,9 +1,12 @@
 export class ClearAllTasksUseCase {
+  /**
+   * @param {TaskRepository} taskRepository - Must implement TaskRepository interface
+   */
   constructor(taskRepository) {
     this.taskRepository = taskRepository;
   }
 
   execute() {
-    this.taskRepository.clearAll();
+    return this.taskRepository.clearAll();
   }
 }

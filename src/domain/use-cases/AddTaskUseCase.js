@@ -1,6 +1,9 @@
 import { Task } from '../entities/Task';
 
 export class AddTaskUseCase {
+  /**
+   * @param {TaskRepository} taskRepository - Must implement TaskRepository interface
+   */
   constructor(taskRepository) {
     this.taskRepository = taskRepository;
   }
@@ -19,6 +22,7 @@ export class AddTaskUseCase {
       category === 'Work' ? workLocation : null
     );
 
+    // Use the repository interface method
     return this.taskRepository.addTask(newTask);
   }
 }

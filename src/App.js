@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './app/redux/hooks';
 import {
-  loadTasks,
-  addTask,
-  toggleComplete,
-  editTask,
+  readTasks,
+  createTask,
+  updateTask,
   deleteTask,
-  clearAllTasks,
   switchRepository,
   setActiveTab,
 } from './app/redux/task/task.actions';
@@ -27,8 +25,9 @@ function App() {
   const [newWorkLocation, setNewWorkLocation] = useState('Work from Home');
   const [newDueDate, setNewDueDate] = useState('');
 
+  // Load tasks on mount - READ operation
   useEffect(() => {
-    dispatch(loadTasks());
+    dispatch(readTasks());
   }, [dispatch]);
 
   const getFilteredTodos = () => {
@@ -42,9 +41,10 @@ function App() {
     return tasks.filter(t => !t.completed);
   };
 
+  // CREATE operation
   const handleAddTodo = () => {
     if (newText.trim()) {
-      dispatch(addTask({
+      dispatch(createTask({
         title: newText.trim(),
         category: newCategory,
         dueDate: newDueDate || new Date().toISOString().split('T')[0],
@@ -58,8 +58,12 @@ function App() {
     }
   };
 
+  // UPDATE operation - toggle complete
   const handleToggleComplete = (id) => {
-    dispatch(toggleComplete(id));
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      dispatch(updateTask(id, { completed: !task.completed }));
+    }
   };
 
   const openEditModal = (todo) => {
@@ -72,6 +76,7 @@ function App() {
     setShowEditModal(true);
   };
 
+  // UPDATE operation - edit task
   const handleSaveEdit = () => {
     if (editText.trim()) {
       const updates = {
@@ -81,12 +86,13 @@ function App() {
       if (editingTodo.category === 'Work') {
         updates.workLocation = editWorkLocation;
       }
-      dispatch(editTask(editingTodo.id, updates));
+      dispatch(updateTask(editingTodo.id, updates));
       setShowEditModal(false);
       setEditingTodo(null);
     }
   };
 
+  // DELETE operation
   const handleDeleteTodo = (id) => {
     if (window.confirm('Delete this task?')) {
       dispatch(deleteTask(id));
@@ -95,7 +101,10 @@ function App() {
 
   const handleClearAll = () => {
     if (window.confirm('Delete all tasks?')) {
-      dispatch(clearAllTasks());
+      // Delete all tasks one by one
+      tasks.forEach(task => {
+        dispatch(deleteTask(task.id));
+      });
     }
   };
 
@@ -128,7 +137,7 @@ function App() {
       <div className="app">
         <div className="sidebar">
           <div className="logo">
-            <h2> TodoList</h2>
+            <h2> QuickTask</h2>
           </div>
         </div>
         <div className="main-content">
@@ -143,7 +152,7 @@ function App() {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="logo">
-          <h2> TodoList</h2>
+          <h2> QuickTask</h2>
         </div>
         
         <nav className="nav-menu">

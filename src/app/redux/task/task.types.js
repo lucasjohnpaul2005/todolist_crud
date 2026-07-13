@@ -1,11 +1,11 @@
-// Action Types
-export const LOAD_TASKS = 'tasks/load';
-export const ADD_TASK = 'tasks/add';
-export const TOGGLE_COMPLETE = 'tasks/toggle';
-export const EDIT_TASK = 'tasks/edit';
+// Only 4 actions for CRUD
+export const CREATE_TASK = 'tasks/create';
+export const READ_TASKS = 'tasks/read';
+export const UPDATE_TASK = 'tasks/update';
 export const DELETE_TASK = 'tasks/delete';
-export const CLEAR_ALL = 'tasks/clear';
-export const SWITCH_REPOSITORY = 'tasks/switch';
-export const SET_ACTIVE_TAB = 'tasks/setTab';
+
+// UI state actions (not CRUD)
 export const SET_LOADING = 'tasks/setLoading';
 export const SET_ERROR = 'tasks/setError';
+export const SET_ACTIVE_TAB = 'tasks/setTab';
+export const SWITCH_REPOSITORY = 'tasks/switchRepository';
