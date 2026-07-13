@@ -92,16 +92,32 @@ function App() {
     }
   };
 
-  // DELETE operation
+  //  DELETE operation - with company task protection
   const handleDeleteTodo = (id) => {
+    const task = tasks.find(t => t.id === id);
+    
+    // Prevent deletion of "Work from Company" tasks
+    if (task && task.workLocation === 'Work from Company') {
+      alert('Dili Pwede e Delete ang Company tasks!');
+      return;
+    }
+    
     if (window.confirm('Delete this task?')) {
       dispatch(deleteTask(id));
     }
   };
 
+  //  Clear All - with company task protection
   const handleClearAll = () => {
+    // Check if there are any company tasks
+    const hasCompanyTasks = tasks.some(t => t.workLocation === 'Work from Company');
+    
+    if (hasCompanyTasks) {
+      alert('Cannot delete all tasks. Company tasks cannot be deleted.');
+      return;
+    }
+    
     if (window.confirm('Delete all tasks?')) {
-      // Delete all tasks one by one
       tasks.forEach(task => {
         dispatch(deleteTask(task.id));
       });
