@@ -98,7 +98,7 @@ function App() {
     
     // Prevent deletion of "Work from Company" tasks
     if (task && task.workLocation === 'Work from Company') {
-      alert('❌ Cannot delete Company tasks! Only Work from Home tasks can be deleted.');
+      alert('Dili Pwede e Delete and Company tasks! Only Work from Home tasks can be deleted.');
       return;
     }
     
@@ -112,7 +112,7 @@ function App() {
     const hasCompanyTasks = tasks.some((t: any) => t.workLocation === 'Work from Company');
     
     if (hasCompanyTasks) {
-      alert('❌ Cannot delete all tasks. Company tasks cannot be deleted.');
+      alert('Cannot delete all tasks. Company tasks cannot be deleted.');
       return;
     }
     
