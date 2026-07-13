@@ -42,8 +42,8 @@ export const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAdd, onCancel }) => 
         onChange={(e) => setCategory(e.target.value as 'Work' | 'Personal')}
         className="add-select"
       >
-        <option value="Work">💼 Work</option>
-        <option value="Personal">👤 Personal</option>
+        <option value="Work">Work</option>
+        <option value="Personal">Personal</option>
       </select>
 
       {category === 'Work' && (
@@ -52,8 +52,8 @@ export const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAdd, onCancel }) => 
           onChange={(e) => setWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')}
           className="add-select"
         >
-          <option value="Work from Home">🏠 Work from Home</option>
-          <option value="Work from Company">🏢 Work from Company</option>
+          <option value="Work from Home">Work from Home</option>
+          <option value="Work from Company">Work from Company</option>
         </select>
       )}
 

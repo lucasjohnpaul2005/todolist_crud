@@ -89,7 +89,7 @@ export const TodoPage: React.FC = () => {
   const handleDeleteTodo = (id: number): void => {
     const task = tasks.find(t => t.id === id);
     if (task?.workLocation === 'Work from Company') {
-      alert('❌ Cannot delete Company tasks! Only Work from Home tasks can be deleted.');
+      alert(' Dili Pwede e delete ang Company tasks! Only Work from Home tasks can be deleted.');
       return;
     }
     if (window.confirm('Delete this task?')) {
@@ -100,7 +100,7 @@ export const TodoPage: React.FC = () => {
   const handleClearAll = (): void => {
     const hasCompanyTasks = tasks.some(t => t.workLocation === 'Work from Company');
     if (hasCompanyTasks) {
-      alert('❌ Cannot delete all tasks. Company tasks cannot be deleted.');
+      alert(' Cannot delete all tasks. Company tasks cannot be deleted.');
       return;
     }
     if (window.confirm('Delete all tasks?')) {
@@ -133,7 +133,7 @@ export const TodoPage: React.FC = () => {
       <div className="app">
         <div className="sidebar">
           <div className="logo">
-            <h2>📋 TodoList</h2>
+            <h2> TodoList</h2>
           </div>
         </div>
         <div className="main-content">
@@ -150,10 +150,10 @@ export const TodoPage: React.FC = () => {
       <div className="main-content">
         <div className="header">
           <h1>
-            {activeTab === 'work' && '💼 Work Tasks'}
-            {activeTab === 'personal' && '👤 Personal Tasks'}
-            {activeTab === 'completed' && '✅ Completed Tasks'}
-            {activeTab === 'settings' && '⚙️ Settings'}
+            {activeTab === 'work' && ' Work Tasks'}
+            {activeTab === 'personal' && ' Personal Tasks'}
+            {activeTab === 'completed' && ' Completed Tasks'}
+            {activeTab === 'settings' && ' Settings'}
           </h1>
           <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
@@ -188,8 +188,8 @@ export const TodoPage: React.FC = () => {
                   onChange={(e) => setNewCategory(e.target.value as 'Work' | 'Personal')} 
                   className="add-select"
                 >
-                  <option value="Work">💼 Work</option>
-                  <option value="Personal">👤 Personal</option>
+                  <option value="Work"> Work</option>
+                  <option value="Personal"> Personal</option>
                 </select>
                 {newCategory === 'Work' && (
                   <select 
@@ -197,8 +197,8 @@ export const TodoPage: React.FC = () => {
                     onChange={(e) => setNewWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')} 
                     className="add-select"
                   >
-                    <option value="Work from Home">🏠 Work from Home</option>
-                    <option value="Work from Company">🏢 Work from Company</option>
+                    <option value="Work from Home"> Work from Home</option>
+                    <option value="Work from Company"> Work from Company</option>
                   </select>
                 )}
                 <input
@@ -217,35 +217,35 @@ export const TodoPage: React.FC = () => {
         ) : (
           <div className="settings-panel">
             <div className="settings-section">
-              <h3>💾 Data Repository</h3>
+              <h3> Data Repository</h3>
               <div className="repository-switch">
                 <button 
                   className={`repo-btn ${repositoryType === 'localStorage' ? 'active' : ''}`}
                   onClick={() => handleSwitchRepository('localStorage')}
                 >
-                  💾 Local Storage
+                   Local Storage
                 </button>
                 <button 
                   className={`repo-btn ${repositoryType === 'inMemory' ? 'active' : ''}`}
                   onClick={() => handleSwitchRepository('inMemory')}
                 >
-                  🧠 In Memory
+                   In Memory
                 </button>
               </div>
               <p style={{ marginTop: '12px', fontSize: '13px', color: '#666' }}>
-                Current: <strong>{repositoryType === 'localStorage' ? '💾 Local Storage' : '🧠 In Memory'}</strong>
+                Current: <strong>{repositoryType === 'localStorage' ? ' Local Storage' : ' In Memory'}</strong>
               </p>
             </div>
 
             <div className="settings-section">
               <h3>Data Management</h3>
               <button onClick={handleClearAll} className="danger-btn">
-                🗑️ Delete All Tasks
+                 Delete All Tasks
               </button>
             </div>
 
             <div className="settings-section">
-              <h3>📊 Statistics</h3>
+              <h3> Statistics</h3>
               <div className="stats-grid">
                 <div className="stat-card"><div className="stat-number">{tasks.length}</div><div className="stat-label">Total</div></div>
                 <div className="stat-card"><div className="stat-number">{tasks.filter(t => t.completed).length}</div><div className="stat-label">Done</div></div>

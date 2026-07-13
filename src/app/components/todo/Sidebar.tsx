@@ -21,7 +21,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, counts
   return (
     <div className="sidebar">
       <div className="logo">
-        <h2>📋 TodoList</h2>
+        <h2> TodoList</h2>
       </div>
       <nav className="nav-menu">
         {tabs.map((tab) => (

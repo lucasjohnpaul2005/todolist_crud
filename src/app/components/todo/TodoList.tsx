@@ -59,10 +59,10 @@ export const TodoList: React.FC<TodoListProps> = ({
             </span>
             <div className="task-actions">
               <button onClick={() => onEdit(todo)} className="edit-btn">
-                ✏️ Edit
+                 Edit
               </button>
               <button onClick={() => onDelete(todo.id)} className="delete-btn">
-                🗑️ Delete
+                 Delete
               </button>
             </div>
           </div>
@@ -72,10 +72,10 @@ export const TodoList: React.FC<TodoListProps> = ({
                 className="location-badge"
                 style={{ backgroundColor: getWorkLocationColor(todo.workLocation) }}
               >
-                📍 {todo.workLocation}
+                 {todo.workLocation}
               </span>
             )}
-            <span className="due-date">📅 {formatDate(todo.dueDate)}</span>
+            <span className="due-date"> {formatDate(todo.dueDate)}</span>
           </div>
         </div>
       ))}

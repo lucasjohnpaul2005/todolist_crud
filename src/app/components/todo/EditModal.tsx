@@ -39,7 +39,7 @@ export const EditModal: React.FC<EditModalProps> = ({ isOpen, todo, onSave, onCl
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>✏️ Edit Task</h3>
+        <h3> Edit Task</h3>
         <div className="modal-field">
           <label>Task Name</label>
           <input
@@ -57,8 +57,8 @@ export const EditModal: React.FC<EditModalProps> = ({ isOpen, todo, onSave, onCl
               onChange={(e) => setWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')}
               className="modal-select"
             >
-              <option value="Work from Home">🏠 Work from Home</option>
-              <option value="Work from Company">🏢 Work from Company</option>
+              <option value="Work from Home">Work from Home</option>
+              <option value="Work from Company">Work from Company</option>
             </select>
           </div>
         )}
