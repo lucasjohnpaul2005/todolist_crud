@@ -4,7 +4,7 @@ export interface Task {
   category: 'Work' | 'Personal';
   dueDate: string;
   completed: boolean;
-  workLocation?: 'Work from Home' | 'Work from Company';
+  workLocation?: 'Work from Home' | 'Work from Company' | null;
 }
 
 export class TaskEntity implements Task {
@@ -14,7 +14,7 @@ export class TaskEntity implements Task {
     public category: 'Work' | 'Personal',
     public dueDate: string,
     public completed: boolean = false,
-    public workLocation?: 'Work from Home' | 'Work from Company'
+    public workLocation?: 'Work from Home' | 'Work from Company' | null
   ) {}
 
   toggleComplete(): void {

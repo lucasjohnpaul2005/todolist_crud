@@ -13,8 +13,17 @@ export class InMemoryTaskRepository implements TaskRepository {
   }
 
   async addTask(task: Task): Promise<Task> {
-    this.tasks.push(task);
-    return task;
+    // ✅ Store as plain object
+    const newTask = {
+      id: task.id,
+      title: task.title,
+      category: task.category,
+      dueDate: task.dueDate,
+      completed: task.completed || false,
+      workLocation: task.workLocation || null,
+    };
+    this.tasks.push(newTask);
+    return newTask;
   }
 
   async updateTask(id: number, updates: Partial<Omit<Task, 'id'>>): Promise<Task | undefined> {
