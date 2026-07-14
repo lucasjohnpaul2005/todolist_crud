@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import {
-  readTasks,
   createTask,
   updateTask,
   deleteTask,
@@ -12,23 +11,32 @@ import { Sidebar } from '../components/todo/Sidebar';
 import { TodoList } from '../components/todo/TodoList';
 import { EditModal } from '../components/todo/EditModal';
 import { Task } from '../../domain/entities/Task';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase/config';
 
 export const TodoPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tasks, activeTab, isLoading, error, repositoryType } = useAppSelector((state) => state.tasks);
-  
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingTodo, setEditingTodo] = useState<Task | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
-  
-  const [newText, setNewText] = useState('');
-  const [newCategory, setNewCategory] = useState<'Work' | 'Personal'>('Personal');
-  const [newWorkLocation, setNewWorkLocation] = useState<'Work from Home' | 'Work from Company'>('Work from Home');
-  const [newDueDate, setNewDueDate] = useState('');
 
-  useEffect(() => {
-    dispatch(readTasks());
-  }, [dispatch]);
+  // UI state
+  const [showEditModal, setShowEditModal] = React.useState(false);
+  const [editingTodo, setEditingTodo] = React.useState<Task | null>(null);
+  const [showAddForm, setShowAddForm] = React.useState(false);
+
+  const [newText, setNewText] = React.useState('');
+  const [newCategory, setNewCategory] = React.useState<'Work' | 'Personal'>('Personal');
+  const [newWorkLocation, setNewWorkLocation] = React.useState<'Work from Home' | 'Work from Company'>('Work from Home');
+  const [newDueDate, setNewDueDate] = React.useState('');
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   const getFilteredTodos = (): Task[] => {
     if (activeTab === 'work') {
@@ -89,7 +97,7 @@ export const TodoPage: React.FC = () => {
   const handleDeleteTodo = (id: number): void => {
     const task = tasks.find(t => t.id === id);
     if (task?.workLocation === 'Work from Company') {
-      alert(' Dili Pwede e delete ang Company tasks! Only Work from Home tasks can be deleted.');
+      alert(' Cannot delete Company tasks!');
       return;
     }
     if (window.confirm('Delete this task?')) {
@@ -110,22 +118,13 @@ export const TodoPage: React.FC = () => {
     }
   };
 
-  const handleSwitchRepository = (type: 'localStorage' | 'inMemory'): void => {
-    dispatch(switchRepository(type));
-  };
-
-  const formatDate = (dateString: string): string => {
-    if (!dateString) return 'No date';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
-
-  const getWorkLocationColor = (location?: string): string => {
-    switch (location) {
-      case 'Work from Home': return '#10b981';
-      case 'Work from Company': return '#3b82f6';
-      default: return '#6b7280';
+  const handleSwitchRepository = (type: 'localStorage' | 'inMemory' | 'firebase'): void => {
+    // Check if trying to switch to Firebase without being logged in
+    if (type === 'firebase' && !auth.currentUser) {
+      alert('Please login first to use Firebase repository.');
+      return;
     }
+    dispatch(switchRepository(type));
   };
 
   if (isLoading && tasks.length === 0) {
@@ -148,14 +147,58 @@ export const TodoPage: React.FC = () => {
       <Sidebar activeTab={activeTab} onTabChange={(tab) => dispatch(setActiveTab(tab))} counts={counts} />
 
       <div className="main-content">
-        <div className="header">
-          <h1>
-            {activeTab === 'work' && ' Work Tasks'}
-            {activeTab === 'personal' && ' Personal Tasks'}
-            {activeTab === 'completed' && ' Completed Tasks'}
-            {activeTab === 'settings' && ' Settings'}
-          </h1>
-          <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        {/* HEADER WITH LOGOUT BUTTON */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          padding: '12px 20px',
+          background: 'rgba(255,255,255,0.1)',
+          borderRadius: '12px',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.2)'
+        }}>
+          <div>
+            <h1 style={{ fontSize: '24px', color: 'white', margin: 0 }}>
+              {activeTab === 'work' && ' Work Tasks'}
+              {activeTab === 'personal' && ' Personal Tasks'}
+              {activeTab === 'completed' && ' Completed Tasks'}
+              {activeTab === 'settings' && ' Settings'}
+            </h1>
+            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ color: 'white', fontSize: '14px' }}>
+               {auth.currentUser?.email || 'User'}
+            </span>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '10px 24px',
+                background: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '2px solid rgba(255, 255, 255, 0.4)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.35)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+               Logout
+            </button>
+          </div>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -183,18 +226,18 @@ export const TodoPage: React.FC = () => {
                   className="add-input"
                   autoFocus
                 />
-                <select 
-                  value={newCategory} 
-                  onChange={(e) => setNewCategory(e.target.value as 'Work' | 'Personal')} 
+                <select
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value as 'Work' | 'Personal')}
                   className="add-select"
                 >
                   <option value="Work"> Work</option>
                   <option value="Personal"> Personal</option>
                 </select>
                 {newCategory === 'Work' && (
-                  <select 
-                    value={newWorkLocation} 
-                    onChange={(e) => setNewWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')} 
+                  <select
+                    value={newWorkLocation}
+                    onChange={(e) => setNewWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')}
                     className="add-select"
                   >
                     <option value="Work from Home"> Work from Home</option>
@@ -219,22 +262,37 @@ export const TodoPage: React.FC = () => {
             <div className="settings-section">
               <h3> Data Repository</h3>
               <div className="repository-switch">
-                <button 
+                <button
                   className={`repo-btn ${repositoryType === 'localStorage' ? 'active' : ''}`}
                   onClick={() => handleSwitchRepository('localStorage')}
                 >
                    Local Storage
                 </button>
-                <button 
+                <button
                   className={`repo-btn ${repositoryType === 'inMemory' ? 'active' : ''}`}
                   onClick={() => handleSwitchRepository('inMemory')}
                 >
                    In Memory
                 </button>
+                <button
+                  className={`repo-btn ${repositoryType === 'firebase' ? 'active' : ''}`}
+                  onClick={() => handleSwitchRepository('firebase')}
+                >
+                   Firebase
+                </button>
               </div>
               <p style={{ marginTop: '12px', fontSize: '13px', color: '#666' }}>
-                Current: <strong>{repositoryType === 'localStorage' ? ' Local Storage' : ' In Memory'}</strong>
+                Current: <strong>
+                  {repositoryType === 'localStorage' && ' Local Storage'}
+                  {repositoryType === 'inMemory' && ' In Memory'}
+                  {repositoryType === 'firebase' && ' Firebase'}
+                </strong>
               </p>
+              {repositoryType === 'firebase' && (
+                <p style={{ marginTop: '8px', fontSize: '12px', color: '#28a745' }}>
+                   Connected to Firebase Cloud
+                </p>
+              )}
             </div>
 
             <div className="settings-section">

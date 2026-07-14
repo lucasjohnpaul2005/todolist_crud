@@ -5,7 +5,6 @@ import { store } from './app/redux/store';
 import App from './App';
 import './index.css';
 import './App.css';
-import './boot';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

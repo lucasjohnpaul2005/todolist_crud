@@ -2,16 +2,18 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { TaskService } from '../../TaskService';
 import { Task } from '../../../domain/entities/Task';
 
+export type RepositoryType = 'localStorage' | 'inMemory' | 'firebase';
+
 const taskService = new TaskService('localStorage');
 
 // CRUD Thunks
 export const createTask = createAsyncThunk(
   'tasks/create',
-  async (taskData: { 
-    title: string; 
-    category: 'Work' | 'Personal'; 
-    dueDate: string; 
-    workLocation?: 'Work from Home' | 'Work from Company' 
+  async (taskData: {
+    title: string;
+    category: 'Work' | 'Personal';
+    dueDate: string;
+    workLocation?: 'Work from Home' | 'Work from Company';
   }) => {
     return taskService.addTask(taskData.title, taskData.category, taskData.dueDate, taskData.workLocation);
   }
@@ -33,16 +35,20 @@ export const deleteTask = createAsyncThunk('tasks/delete', async (id: number) =>
   return id;
 });
 
-export const switchRepository = createAsyncThunk('tasks/switchRepository', async (type: 'localStorage' | 'inMemory') => {
-  return taskService.switchRepository(type);
-});
+// ✅ Updated to accept all three repository types
+export const switchRepository = createAsyncThunk(
+  'tasks/switchRepository',
+  async (type: 'localStorage' | 'inMemory' | 'firebase') => {
+    return taskService.switchRepository(type);
+  }
+);
 
 interface TaskState {
   tasks: Task[];
   activeTab: 'work' | 'personal' | 'completed' | 'settings';
   isLoading: boolean;
   error: string | null;
-  repositoryType: 'localStorage' | 'inMemory';
+  repositoryType: RepositoryType;
 }
 
 const initialState: TaskState = {
@@ -96,6 +102,7 @@ const taskSlice = createSlice({
         state.tasks = state.tasks.filter(t => t.id !== action.payload);
         state.error = null;
       })
+      // ✅ Updated to handle all three repository types
       .addCase(switchRepository.fulfilled, (state, action) => {
         state.tasks = action.payload;
         state.repositoryType = action.meta.arg;
