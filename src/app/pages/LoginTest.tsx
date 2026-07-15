@@ -16,9 +16,9 @@ export const LoginTest: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('🔐 Checking auth state...');
+    console.log(' Checking auth state...');
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('🔐 Auth state:', user ? `Logged in as ${user.email}` : 'Not logged in');
+      console.log(' Auth state:', user ? `Logged in as ${user.email}` : 'Not logged in');
       setUser(user);
       setLoading(false);
     });
@@ -31,30 +31,30 @@ export const LoginTest: React.FC = () => {
     try {
       if (isLogin) {
         const result = await signInWithEmailAndPassword(auth, email, password);
-        console.log('✅ Login success:', result.user.email);
+        console.log(' Login success:', result.user.email);
       } else {
         const result = await createUserWithEmailAndPassword(auth, email, password);
-        console.log('✅ Register success:', result.user.email);
+        console.log(' Register success:', result.user.email);
       }
     } catch (error: any) {
-      console.error('❌ Auth error:', error.code);
+      console.error(' Auth error:', error.code);
       setError(error.message);
     }
   };
 
   const handleLogout = async () => {
     await signOut(auth);
-    console.log('✅ Logged out');
+    console.log(' Logged out');
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>⏳ Loading...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center' }}> Loading...</div>;
   }
 
   if (user) {
     return (
       <div style={{ padding: '40px', textAlign: 'center' }}>
-        <h2>✅ Logged in as: {user.email}</h2>
+        <h2> Logged in as: {user.email}</h2>
         <button onClick={handleLogout} style={{ padding: '10px 20px', fontSize: '16px' }}>
           Logout
         </button>

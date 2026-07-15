@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Your Firebase configuration - replace with your own
+// Your Firebase configuration gi kuha nako ni sa firebase console
 const firebaseConfig = {
   apiKey: "AIzaSyDlDBjWPN5RB94B8-NyfvJhcUAgvSvZPzE",
   authDomain: "todolist-crud-a063e.firebaseapp.com",

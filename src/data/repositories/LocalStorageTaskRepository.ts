@@ -13,7 +13,7 @@ export class LocalStorageTaskRepository implements TaskRepository {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
   }
 
-  // ✅ Return plain objects, NOT TaskEntity instances
+  //  Return plain objects, NOT TaskEntity instances
   async getAllTasks(): Promise<Task[]> {
     const data = this.loadFromStorage();
     return data.map((item: any) => ({
@@ -33,7 +33,7 @@ export class LocalStorageTaskRepository implements TaskRepository {
 
   async addTask(task: Task): Promise<Task> {
     const tasks = await this.getAllTasks();
-    // ✅ Store as plain object
+    //  Store as plain object
     const newTask = {
       id: task.id,
       title: task.title,
@@ -70,9 +70,9 @@ export class LocalStorageTaskRepository implements TaskRepository {
   }
 
   async clearAll(): Promise<void> {
-    console.log('🗑️ Clearing ALL tasks from LocalStorage');
+    console.log(' Clearing ALL tasks from LocalStorage');
     this.saveToStorage([]);
-    console.log('✅ All tasks cleared from LocalStorage');
+    console.log(' All tasks cleared from LocalStorage');
   }
 
   async getTasksByCategory(category: 'Work' | 'Personal'): Promise<Task[]> {

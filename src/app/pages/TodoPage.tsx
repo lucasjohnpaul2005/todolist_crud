@@ -136,7 +136,7 @@ export const TodoPage: React.FC = () => {
           </div>
         </div>
         <div className="main-content">
-          <div className="loading-state">Loading...</div>
+          <div className="loading-state">Gwapo ko...</div>
         </div>
       </div>
     );

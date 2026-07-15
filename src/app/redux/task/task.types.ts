@@ -10,5 +10,5 @@ export const SET_ERROR = 'tasks/setError';
 export const SET_ACTIVE_TAB = 'tasks/setTab';
 export const SWITCH_REPOSITORY = 'tasks/switchRepository';
 
-// Repository Types - ADD 'firebase' here
+// Repository Types -'firebase'
 export type RepositoryType = 'localStorage' | 'inMemory' | 'firebase';

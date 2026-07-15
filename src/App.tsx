@@ -40,7 +40,7 @@ const App: React.FC = () => {
         color: 'white'
       }}>
         <div style={{ textAlign: 'center' }}>
-          <h2> Loading...</h2>
+          <h2> Pag hulat...</h2>
         </div>
       </div>
     );

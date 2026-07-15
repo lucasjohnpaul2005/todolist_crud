@@ -35,7 +35,7 @@ export const deleteTask = createAsyncThunk('tasks/delete', async (id: number) =>
   return id;
 });
 
-// ✅ Updated to accept all three repository types
+//  Updated to accept all three repository types
 export const switchRepository = createAsyncThunk(
   'tasks/switchRepository',
   async (type: 'localStorage' | 'inMemory' | 'firebase') => {
@@ -102,7 +102,7 @@ const taskSlice = createSlice({
         state.tasks = state.tasks.filter(t => t.id !== action.payload);
         state.error = null;
       })
-      // ✅ Updated to handle all three repository types
+      //  Updated to handle all three repository types
       .addCase(switchRepository.fulfilled, (state, action) => {
         state.tasks = action.payload;
         state.repositoryType = action.meta.arg;
