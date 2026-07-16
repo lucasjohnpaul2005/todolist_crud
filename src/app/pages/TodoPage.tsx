@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import {
   createTask,
@@ -7,7 +7,6 @@ import {
   switchRepository,
   setActiveTab,
 } from '../redux/task/task.actions';
-import { Sidebar } from '../components/todo/Sidebar';
 import { TodoList } from '../components/todo/TodoList';
 import { EditModal } from '../components/todo/EditModal';
 import { Task } from '../../domain/entities/Task';
@@ -18,15 +17,18 @@ export const TodoPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tasks, activeTab, isLoading, error, repositoryType } = useAppSelector((state) => state.tasks);
 
-  // UI state
-  const [showEditModal, setShowEditModal] = React.useState(false);
-  const [editingTodo, setEditingTodo] = React.useState<Task | null>(null);
-  const [showAddForm, setShowAddForm] = React.useState(false);
+  //  Sidebar state for mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const [newText, setNewText] = React.useState('');
-  const [newCategory, setNewCategory] = React.useState<'Work' | 'Personal'>('Personal');
-  const [newWorkLocation, setNewWorkLocation] = React.useState<'Work from Home' | 'Work from Company'>('Work from Home');
-  const [newDueDate, setNewDueDate] = React.useState('');
+  // UI state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingTodo, setEditingTodo] = useState<Task | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const [newText, setNewText] = useState('');
+  const [newCategory, setNewCategory] = useState<'Work' | 'Personal'>('Personal');
+  const [newWorkLocation, setNewWorkLocation] = useState<'Work from Home' | 'Work from Company'>('Work from Home');
+  const [newDueDate, setNewDueDate] = useState('');
 
   // Handle logout
   const handleLogout = async () => {
@@ -54,11 +56,6 @@ export const TodoPage: React.FC = () => {
   };
 
   const filteredTodos = getFilteredTodos();
-  const counts = {
-    work: getCategoryCount('Work'),
-    personal: getCategoryCount('Personal'),
-    completed: tasks.filter(t => t.completed).length,
-  };
 
   const handleAddTodo = (): void => {
     if (newText.trim()) {
@@ -119,7 +116,6 @@ export const TodoPage: React.FC = () => {
   };
 
   const handleSwitchRepository = (type: 'localStorage' | 'inMemory' | 'firebase'): void => {
-    // Check if trying to switch to Firebase without being logged in
     if (type === 'firebase' && !auth.currentUser) {
       alert('Please login first to use Firebase repository.');
       return;
@@ -136,7 +132,7 @@ export const TodoPage: React.FC = () => {
           </div>
         </div>
         <div className="main-content">
-          <div className="loading-state">Gwapo ko...</div>
+          <div className="loading-state">Loading...</div>
         </div>
       </div>
     );
@@ -144,60 +140,128 @@ export const TodoPage: React.FC = () => {
 
   return (
     <div className="app">
-      <Sidebar activeTab={activeTab} onTabChange={(tab) => dispatch(setActiveTab(tab))} counts={counts} />
+      {/*  HAMBURGER MENU BUTTON - Only visible on mobile */}
+      <button 
+        className="menu-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        aria-label="Toggle sidebar"
+      >
+        ☰
+      </button>
 
+      {/*  SIDEBAR - Always visible on desktop, toggles on mobile */}
+      <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <h2> TodoList</h2>
+          <button className="sidebar-close" onClick={() => setIsSidebarOpen(false)}>
+            ✕
+          </button>
+        </div>
+        <div className="logo">
+          <h2> TodoList</h2>
+        </div>
+        <nav className="nav-menu">
+          <button 
+            className={`nav-item ${activeTab === 'work' ? 'active' : ''}`}
+            onClick={() => {
+              dispatch(setActiveTab('work'));
+              setIsSidebarOpen(false);
+            }}
+          >
+            <span className="nav-icon"></span>
+            <span className="nav-text">Work Tasks</span>
+            <span className="nav-count">{getCategoryCount('Work')}</span>
+          </button>
+          
+          <button 
+            className={`nav-item ${activeTab === 'personal' ? 'active' : ''}`}
+            onClick={() => {
+              dispatch(setActiveTab('personal'));
+              setIsSidebarOpen(false);
+            }}
+          >
+            <span className="nav-icon"></span>
+            <span className="nav-text">Personal Tasks</span>
+            <span className="nav-count">{getCategoryCount('Personal')}</span>
+          </button>
+          
+          <button 
+            className={`nav-item ${activeTab === 'completed' ? 'active' : ''}`}
+            onClick={() => {
+              dispatch(setActiveTab('completed'));
+              setIsSidebarOpen(false);
+            }}
+          >
+            <span className="nav-icon"></span>
+            <span className="nav-text">Completed</span>
+            <span className="nav-count">{tasks.filter(t => t.completed).length}</span>
+          </button>
+          
+          <button 
+            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => {
+              dispatch(setActiveTab('settings'));
+              setIsSidebarOpen(false);
+            }}
+          >
+            <span className="nav-icon"></span>
+            <span className="nav-text">Settings</span>
+          </button>
+        </nav>
+      </div>
+
+      {/*  OVERLAY - Only visible on mobile when sidebar is open */}
+      {isSidebarOpen && (
+        <div className="sidebar-overlay open" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
+      {/* Main Content */}
       <div className="main-content">
-        {/* HEADER WITH LOGOUT BUTTON */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px',
-          padding: '12px 20px',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: '12px',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.2)'
-        }}>
-          <div>
-            <h1 style={{ fontSize: '24px', color: 'white', margin: 0 }}>
+        <div className="header">
+          <div className="header-left">
+            <h1>
               {activeTab === 'work' && ' Work Tasks'}
               {activeTab === 'personal' && ' Personal Tasks'}
               {activeTab === 'completed' && ' Completed Tasks'}
               {activeTab === 'settings' && ' Settings'}
             </h1>
-            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
+            <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span style={{ color: 'white', fontSize: '14px' }}>
-               {auth.currentUser?.email || 'User'}
-            </span>
-            <button
-              onClick={handleLogout}
-              style={{
-                padding: '10px 24px',
-                background: 'rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                border: '2px solid rgba(255, 255, 255, 0.4)',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.3s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.35)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
+          <div className="header-right">
+            <span className="user-email"> {auth.currentUser?.email || 'User'}</span>
+            <button onClick={handleLogout} className="logout-btn">
                Logout
             </button>
+          </div>
+        </div>
+
+        {/* Stats Dashboard */}
+        <div className="stats-dashboard">
+          <div className="stat-cards">
+            <div className="stat-card">
+              <div className="stat-number">{tasks.length}</div>
+              <div className="stat-label">Total</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{tasks.filter(t => t.completed).length}</div>
+              <div className="stat-label">Done</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{tasks.filter(t => !t.completed).length}</div>
+              <div className="stat-label">Pending</div>
+            </div>
+          </div>
+          <div className="progress-section">
+            <div className="progress-header">
+              <span>Progress</span>
+              <span>{tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%</span>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ width: `${tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%` }}
+              />
+            </div>
           </div>
         </div>
 
