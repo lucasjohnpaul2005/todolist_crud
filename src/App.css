@@ -50,45 +50,8 @@ body {
 }
 
 /* ============================================
-   SIDEBAR - Enhanced Mobile
+   HAMBURGER MENU BUTTON - VISIBLE ON MOBILE
    ============================================ */
-.sidebar {
-  width: 280px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1000;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-y: auto;
-}
-
-.sidebar.closed {
-  transform: translateX(-100%);
-}
-
-/* Sidebar Overlay */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.sidebar-overlay.open {
-  display: block;
-}
-
-/* Hamburger Menu Button */
 .menu-toggle {
   display: none;
   position: fixed;
@@ -121,15 +84,68 @@ body {
 }
 
 .menu-toggle.hidden {
-  display: none;
+  display: none !important;
 }
 
+/* ============================================
+   SIDEBAR - Enhanced Mobile
+   ============================================ */
+.sidebar {
+  width: 280px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+
+/* Sidebar closed state (mobile) */
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Sidebar open state (mobile) */
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.open {
+  display: block;
+}
+
+/* Sidebar Header (Mobile) */
 .sidebar-header {
   display: none;
-  padding: 20px;
+  padding: 20px 24px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   align-items: center;
   justify-content: space-between;
+}
+
+.sidebar-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  color: var(--gray-800);
 }
 
 .sidebar-close {
@@ -238,7 +254,7 @@ body {
 }
 
 /* ============================================
-   MAIN CONTENT - Enhanced Mobile
+   MAIN CONTENT
    ============================================ */
 .main-content {
   flex: 1;
@@ -252,7 +268,7 @@ body {
 }
 
 /* ============================================
-   HEADER - Enhanced Mobile
+   HEADER
    ============================================ */
 .header {
   display: flex;
@@ -416,7 +432,7 @@ body {
 }
 
 /* ============================================
-   TASK LIST - Enhanced Mobile
+   TASK LIST
    ============================================ */
 .task-list {
   display: flex;
@@ -553,7 +569,7 @@ body {
 }
 
 /* ============================================
-   ADD TASK BUTTON - Enhanced Mobile
+   ADD TASK BUTTON
    ============================================ */
 .add-task-btn {
   width: 100%;
@@ -585,7 +601,7 @@ body {
 }
 
 /* ============================================
-   ADD FORM - Enhanced Mobile
+   ADD FORM
    ============================================ */
 .add-form {
   background: white;
@@ -669,7 +685,7 @@ body {
 }
 
 /* ============================================
-   EMPTY STATE - Enhanced Mobile
+   EMPTY STATE
    ============================================ */
 .empty-state {
   text-align: center;
@@ -713,7 +729,7 @@ body {
 }
 
 /* ============================================
-   SETTINGS PANEL - Enhanced Mobile
+   SETTINGS PANEL
    ============================================ */
 .settings-panel {
   max-width: 100%;
@@ -830,7 +846,7 @@ body {
 }
 
 /* ============================================
-   MODAL - Enhanced Mobile
+   MODAL
    ============================================ */
 .modal-overlay {
   position: fixed;
@@ -1142,19 +1158,11 @@ body {
 }
 
 /* ============================================
-   RESPONSIVE DESIGN - Enhanced Mobile
+   RESPONSIVE DESIGN
    ============================================ */
 
-/* Tablets & Small Laptops */
-@media (max-width: 1024px) {
-  .main-content {
-    padding: 20px 24px;
-  }
-}
-
-/* Mobile Devices */
+/* Show hamburger menu on mobile */
 @media (max-width: 768px) {
-  /* Sidebar - Hamburger Menu */
   .menu-toggle {
     display: flex !important;
   }
@@ -1355,7 +1363,7 @@ body {
   }
 }
 
-/* Small Mobile Devices (max-width: 480px) */
+/* Small Mobile */
 @media (max-width: 480px) {
   .main-content {
     padding: 12px 12px 20px;
