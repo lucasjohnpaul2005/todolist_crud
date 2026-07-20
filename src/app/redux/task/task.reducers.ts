@@ -19,27 +19,23 @@ const initialState: TaskState = {
   repositoryType: 'localStorage',
 };
 
-interface Action {
-  type: string;
-  payload?: any;
-}
-
-const taskReducer = (state: TaskState = initialState, action: Action): TaskState => {
+const taskReducer = (state: TaskState = initialState, action: any): TaskState => {
   switch (action.type) {
     case types.CREATE_TASK:
-      return { ...state, tasks: [...state.tasks, action.payload] };
+      return { ...state, tasks: [...state.tasks, { ...action.payload }] };
 
     case types.READ_TASKS:
-      return { ...state, tasks: action.payload };
+      return { ...state, tasks: action.payload ? action.payload.map((t: Task) => ({ ...t })) : [] };
 
-    case types.UPDATE_TASK:
-      const updateIndex = state.tasks.findIndex(t => t.id === action.payload?.id);
-      if (updateIndex !== -1) {
+    case types.UPDATE_TASK: {
+      const index = state.tasks.findIndex(t => t.id === action.payload?.id);
+      if (index !== -1) {
         const newTasks = [...state.tasks];
-        newTasks[updateIndex] = action.payload;
+        newTasks[index] = { ...action.payload };
         return { ...state, tasks: newTasks };
       }
       return state;
+    }
 
     case types.DELETE_TASK:
       return { ...state, tasks: state.tasks.filter(t => t.id !== action.payload) };
@@ -56,7 +52,7 @@ const taskReducer = (state: TaskState = initialState, action: Action): TaskState
     case types.SWITCH_REPOSITORY:
       return {
         ...state,
-        tasks: action.payload.tasks,
+        tasks: action.payload.tasks ? action.payload.tasks.map((t: Task) => ({ ...t })) : [],
         repositoryType: action.payload.type,
       };
 

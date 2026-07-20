@@ -12,6 +12,36 @@ import { FirebaseTaskRepository } from '../data/repositories/FirebaseTaskReposit
 
 export type RepositoryType = 'localStorage' | 'inMemory' | 'firebase';
 
+//  SINGLETON: Create repositories once and reuse them
+class RepositorySingleton {
+  private static instance: RepositorySingleton;
+  private inMemoryRepo: InMemoryTaskRepository | null = null;
+  private localStorageRepo: LocalStorageTaskRepository | null = null;
+
+  private constructor() {}
+
+  static getInstance(): RepositorySingleton {
+    if (!RepositorySingleton.instance) {
+      RepositorySingleton.instance = new RepositorySingleton();
+    }
+    return RepositorySingleton.instance;
+  }
+
+  getInMemoryRepo(): InMemoryTaskRepository {
+    if (!this.inMemoryRepo) {
+      this.inMemoryRepo = new InMemoryTaskRepository();
+    }
+    return this.inMemoryRepo;
+  }
+
+  getLocalStorageRepo(): LocalStorageTaskRepository {
+    if (!this.localStorageRepo) {
+      this.localStorageRepo = new LocalStorageTaskRepository();
+    }
+    return this.localStorageRepo;
+  }
+}
+
 export class TaskService {
   private repository: TaskRepository;
   private repositoryType: RepositoryType;
@@ -27,26 +57,25 @@ export class TaskService {
   }
 
   private createRepository(type: RepositoryType): TaskRepository {
-    console.log(' Creating repository:', type);
+    const singleton = RepositorySingleton.getInstance();
     
     if (type === 'inMemory') {
-      console.log(' Creating InMemory repository (temporary)');
-      return new InMemoryTaskRepository();
+      console.log(' Using singleton InMemory repository');
+      return singleton.getInMemoryRepo();
     } else if (type === 'firebase') {
       if (!this.userId) {
-        console.warn(' No user ID for Firebase repository, falling back to LocalStorage');
-        return new LocalStorageTaskRepository();
+        console.warn(' No user ID for Firebase, using LocalStorage');
+        return singleton.getLocalStorageRepo();
       }
       console.log(' Creating Firebase repository for user:', this.userId);
       return new FirebaseTaskRepository(this.userId);
     } else {
-      console.log(' Creating LocalStorage repository (persistent)');
-      return new LocalStorageTaskRepository();
+      console.log(' Using singleton LocalStorage repository');
+      return singleton.getLocalStorageRepo();
     }
   }
 
   setUserId(userId: string): void {
-    console.log(' Setting user ID:', userId);
     this.userId = userId;
     this.repository = this.createRepository(this.repositoryType);
   }
@@ -56,7 +85,6 @@ export class TaskService {
   }
 
   setRepository(type: RepositoryType): void {
-    console.log(' Setting repository type:', type);
     this.repositoryType = type;
     this.repository = this.createRepository(type);
   }
@@ -67,15 +95,15 @@ export class TaskService {
     dueDate: string,
     workLocation?: 'Work from Home' | 'Work from Company'
   ): Promise<Task> {
-    console.log(' Adding task to:', this.repositoryType, 'Title:', title);
+    console.log(' TaskService: addTask() - Title:', title);
     const useCase = new AddTaskUseCase(this.repository);
     const result = await useCase.execute(title, category, dueDate, workLocation);
-    console.log(' Task added to:', this.repositoryType);
+    console.log(' TaskService: addTask() - Result ID:', result.id);
     return result;
   }
 
   async removeTask(id: number): Promise<boolean> {
-    console.log(' Removing task from:', this.repositoryType, 'ID:', id);
+    console.log(' TaskService: removeTask() - ID:', id);
     const useCase = new RemoveTaskUseCase(this.repository);
     return useCase.execute(id);
   }
@@ -84,16 +112,16 @@ export class TaskService {
     id: number,
     updates: Partial<Omit<Task, 'id'>>
   ): Promise<Task | undefined> {
-    console.log(' Updating task in:', this.repositoryType, 'ID:', id);
+    console.log(' TaskService: updateTask() - ID:', id);
     const useCase = new UpdateTaskUseCase(this.repository);
     return useCase.execute(id, updates);
   }
 
   async getAllTasks(): Promise<Task[]> {
-    console.log(' Getting all tasks from:', this.repositoryType);
+    console.log(' TaskService: getAllTasks()');
     const useCase = new GetAllTasksUseCase(this.repository);
     const tasks = await useCase.execute();
-    console.log(' Found', tasks.length, 'tasks in', this.repositoryType);
+    console.log(' TaskService: Found', tasks.length, 'tasks');
     return tasks;
   }
 
@@ -103,7 +131,7 @@ export class TaskService {
   }
 
   async clearAllTasks(): Promise<void> {
-    console.log(' Clearing all tasks from:', this.repositoryType);
+    console.log(' TaskService: clearAllTasks()');
     const useCase = new ClearAllTasksUseCase(this.repository);
     return useCase.execute();
   }

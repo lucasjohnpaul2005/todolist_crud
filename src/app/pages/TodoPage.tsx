@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import {
   createTask,
@@ -17,7 +17,14 @@ export const TodoPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tasks, activeTab, isLoading, error, repositoryType } = useAppSelector((state) => state.tasks);
 
-  //  Sidebar state for mobile
+  //  DEBUG: Log Redux state changes
+  useEffect(() => {
+    console.log(' TODO PAGE: Redux tasks:', tasks);
+    console.log(' TODO PAGE: Redux task IDs:', tasks.map(t => t.id));
+    console.log(' TODO PAGE: tasks count:', tasks.length);
+  }, [tasks]);
+
+  // Sidebar state for mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // UI state
@@ -57,14 +64,20 @@ export const TodoPage: React.FC = () => {
 
   const filteredTodos = getFilteredTodos();
 
+  //  CREATE - Add Task with debug logs
   const handleAddTodo = (): void => {
     if (newText.trim()) {
+      console.log(' handleAddTodo: Adding task:', newText.trim());
+      console.log(' handleAddTodo: Category:', newCategory);
+      console.log(' handleAddTodo: DueDate:', newDueDate);
+      
       dispatch(createTask({
         title: newText.trim(),
         category: newCategory,
         dueDate: newDueDate || new Date().toISOString().split('T')[0],
         workLocation: newCategory === 'Work' ? newWorkLocation : undefined,
       }));
+      
       setNewText('');
       setNewCategory('Personal');
       setNewWorkLocation('Work from Home');
@@ -73,31 +86,54 @@ export const TodoPage: React.FC = () => {
     }
   };
 
+  //  UPDATE - Toggle Complete with debug logs
   const handleToggleComplete = (id: number): void => {
+    console.log(' handleToggleComplete: Called with ID:', id);
+    console.log(' handleToggleComplete: Current tasks in Redux:', tasks);
+    console.log(' handleToggleComplete: Task IDs:', tasks.map(t => t.id));
+    
     const task = tasks.find(t => t.id === id);
+    console.log(' handleToggleComplete: Found task:', task);
+    
     if (task) {
+      console.log(' handleToggleComplete: Toggling complete for:', task.title);
       dispatch(updateTask(id, { completed: !task.completed }));
+    } else {
+      console.error(' handleToggleComplete: Task with ID', id, 'NOT found in Redux!');
+      console.log(' handleToggleComplete: Available IDs:', tasks.map(t => t.id));
     }
   };
 
   const openEditModal = (todo: Task): void => {
+    console.log(' openEditModal: Editing task:', todo);
     setEditingTodo(todo);
     setShowEditModal(true);
   };
 
+  //  UPDATE - Save Edit with debug logs
   const handleSaveEdit = (id: number, updates: { title: string; dueDate: string; workLocation?: 'Work from Home' | 'Work from Company' }): void => {
+    console.log(' handleSaveEdit: Saving edit for ID:', id);
+    console.log(' handleSaveEdit: Updates:', updates);
     dispatch(updateTask(id, updates));
     setShowEditModal(false);
     setEditingTodo(null);
   };
 
+  //  DELETE - Delete Task with debug logs
   const handleDeleteTodo = (id: number): void => {
+    console.log(' handleDeleteTodo: Called with ID:', id);
+    console.log(' handleDeleteTodo: Available task IDs:', tasks.map(t => t.id));
+    
     const task = tasks.find(t => t.id === id);
+    console.log(' handleDeleteTodo: Found task:', task);
+    
     if (task?.workLocation === 'Work from Company') {
       alert(' Cannot delete Company tasks!');
       return;
     }
+    
     if (window.confirm('Delete this task?')) {
+      console.log(' handleDeleteTodo: Deleting task ID:', id);
       dispatch(deleteTask(id));
     }
   };
@@ -116,6 +152,7 @@ export const TodoPage: React.FC = () => {
   };
 
   const handleSwitchRepository = (type: 'localStorage' | 'inMemory' | 'firebase'): void => {
+    console.log(' handleSwitchRepository: Switching to:', type);
     if (type === 'firebase' && !auth.currentUser) {
       alert('Please login first to use Firebase repository.');
       return;
@@ -140,7 +177,7 @@ export const TodoPage: React.FC = () => {
 
   return (
     <div className="app">
-      {/*  HAMBURGER MENU BUTTON - Only visible on mobile */}
+      {/* HAMBURGER MENU BUTTON - Mobile Only */}
       <button 
         className="menu-toggle"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -149,7 +186,7 @@ export const TodoPage: React.FC = () => {
         ☰
       </button>
 
-      {/*  SIDEBAR - Always visible on desktop, toggles on mobile */}
+      {/* SIDEBAR */}
       <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h2> TodoList</h2>
@@ -210,7 +247,7 @@ export const TodoPage: React.FC = () => {
         </nav>
       </div>
 
-      {/*  OVERLAY - Only visible on mobile when sidebar is open */}
+      {/* OVERLAY - Mobile only */}
       {isSidebarOpen && (
         <div className="sidebar-overlay open" onClick={() => setIsSidebarOpen(false)} />
       )}
