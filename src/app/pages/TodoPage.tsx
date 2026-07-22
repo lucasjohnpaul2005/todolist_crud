@@ -334,6 +334,8 @@ export const TodoPage: React.FC = () => {
               <div className="add-form">
                 <input
                   type="text"
+                  id="new-task-title"
+                  name="new-task-title"
                   placeholder="Task name"
                   value={newText}
                   onChange={(e) => setNewText(e.target.value)}
@@ -341,6 +343,8 @@ export const TodoPage: React.FC = () => {
                   autoFocus
                 />
                 <select
+                  id="new-task-category"
+                  name="new-task-category"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value as 'Work' | 'Personal')}
                   className="add-select"
@@ -350,6 +354,8 @@ export const TodoPage: React.FC = () => {
                 </select>
                 {newCategory === 'Work' && (
                   <select
+                    id="new-task-work-location"
+                    name="new-task-work-location"
                     value={newWorkLocation}
                     onChange={(e) => setNewWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')}
                     className="add-select"
@@ -360,6 +366,8 @@ export const TodoPage: React.FC = () => {
                 )}
                 <input
                   type="date"
+                  id="new-task-due-date"
+                  name="new-task-due-date"
                   value={newDueDate}
                   onChange={(e) => setNewDueDate(e.target.value)}
                   className="add-input"

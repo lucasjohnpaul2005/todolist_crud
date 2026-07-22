@@ -42,9 +42,11 @@ export const EditModal: React.FC<EditModalProps> = ({ isOpen, todo, onSave, onCl
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h3><Pencil size={18} /> Edit Task</h3>
         <div className="modal-field">
-          <label>Task Name</label>
+          <label htmlFor="edit-task-title">Task Name</label>
           <input
             type="text"
+            id="edit-task-title"
+            name="edit-task-title"
             value={text}
             onChange={(e) => setText(e.target.value)}
             className="modal-input"
@@ -52,8 +54,10 @@ export const EditModal: React.FC<EditModalProps> = ({ isOpen, todo, onSave, onCl
         </div>
         {todo.category === 'Work' && (
           <div className="modal-field">
-            <label>Work Location</label>
+            <label htmlFor="edit-task-work-location">Work Location</label>
             <select
+              id="edit-task-work-location"
+              name="edit-task-work-location"
               value={workLocation}
               onChange={(e) => setWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')}
               className="modal-select"
@@ -64,9 +68,11 @@ export const EditModal: React.FC<EditModalProps> = ({ isOpen, todo, onSave, onCl
           </div>
         )}
         <div className="modal-field">
-          <label>Due Date</label>
+          <label htmlFor="edit-task-due-date">Due Date</label>
           <input
             type="date"
+            id="edit-task-due-date"
+            name="edit-task-due-date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             className="modal-input"

@@ -61,9 +61,12 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label><Mail size={14} /> Email</label>
+            <label htmlFor="auth-email"><Mail size={14} /> Email</label>
             <input
               type="email"
+              id="auth-email"
+              name="email"
+              autoComplete="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -72,9 +75,12 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
           </div>
 
           <div className="auth-field">
-            <label><Lock size={14} /> Password</label>
+            <label htmlFor="auth-password"><Lock size={14} /> Password</label>
             <input
               type="password"
+              id="auth-password"
+              name="password"
+              autoComplete={isLogin ? 'current-password' : 'new-password'}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
