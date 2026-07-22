@@ -1,5 +1,6 @@
 import React from 'react';
 import { Task } from '../../../domain/entities/Task';
+import { Pencil, Trash2, Home, Building2, CalendarDays, Inbox } from 'lucide-react';
 
 interface TodoListProps {
   todos: Task[];
@@ -27,17 +28,29 @@ export const TodoList: React.FC<TodoListProps> = ({
   const getWorkLocationColor = (location?: string): string => {
     switch (location) {
       case 'Work from Home':
-        return '#10b981';
+        return '#2f9e6e';
       case 'Work from Company':
-        return '#3b82f6';
+        return '#1f6f5c';
       default:
-        return '#6b7280';
+        return '#7d7565';
+    }
+  };
+
+  const getWorkLocationIcon = (location?: string) => {
+    switch (location) {
+      case 'Work from Home':
+        return <Home size={12} />;
+      case 'Work from Company':
+        return <Building2 size={12} />;
+      default:
+        return null;
     }
   };
 
   if (todos.length === 0) {
     return (
       <div className="empty-state">
+        <Inbox className="empty-icon" size={48} strokeWidth={1.5} />
         <p>No tasks here. Add one below!</p>
       </div>
     );
@@ -59,10 +72,10 @@ export const TodoList: React.FC<TodoListProps> = ({
             </span>
             <div className="task-actions">
               <button onClick={() => onEdit(todo)} className="edit-btn">
-                 Edit
+                <Pencil size={14} /> Edit
               </button>
               <button onClick={() => onDelete(todo.id)} className="delete-btn">
-                 Delete
+                <Trash2 size={14} /> Delete
               </button>
             </div>
           </div>
@@ -72,10 +85,12 @@ export const TodoList: React.FC<TodoListProps> = ({
                 className="location-badge"
                 style={{ backgroundColor: getWorkLocationColor(todo.workLocation) }}
               >
-                 {todo.workLocation}
+                {getWorkLocationIcon(todo.workLocation)} {todo.workLocation}
               </span>
             )}
-            <span className="due-date"> {formatDate(todo.dueDate)}</span>
+            <span className="due-date">
+              <CalendarDays size={14} /> {formatDate(todo.dueDate)}
+            </span>
           </div>
         </div>
       ))}

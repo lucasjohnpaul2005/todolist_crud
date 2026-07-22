@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
+import { Mail, Lock, LogIn, UserPlus, Loader2 } from 'lucide-react';
 
 interface AuthProps {
   onAuthSuccess: (userId: string) => void;
@@ -53,14 +54,14 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       <div className="auth-card">
         <h2>{isLogin ? 'Login' : 'Create Account'}</h2>
         <p className="auth-subtitle">
-          {isLogin 
-            ? 'Sign in to access your tasks' 
+          {isLogin
+            ? 'Sign in to access your tasks'
             : 'Register to start managing your tasks'}
         </p>
 
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label>Email</label>
+            <label><Mail size={14} /> Email</label>
             <input
               type="email"
               placeholder="Enter your email"
@@ -71,7 +72,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
           </div>
 
           <div className="auth-field">
-            <label>Password</label>
+            <label><Lock size={14} /> Password</label>
             <input
               type="password"
               placeholder="Enter your password"
@@ -84,24 +85,36 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
 
           {error && <p className="auth-error">{error}</p>}
 
-          <button 
-            type="submit" 
-            className="auth-btn" 
+          <button
+            type="submit"
+            className="auth-btn"
             disabled={loading}
           >
-            {loading ? 'Loading...' : (isLogin ? 'Login' : 'Register')}
+            {loading ? (
+              <>
+                <Loader2 size={18} className="loading-spinner" /> Loading...
+              </>
+            ) : isLogin ? (
+              <>
+                <LogIn size={18} /> Login
+              </>
+            ) : (
+              <>
+                <UserPlus size={18} /> Register
+              </>
+            )}
           </button>
         </form>
 
-        <button 
+        <button
           className="auth-switch-btn"
           onClick={() => {
             setIsLogin(!isLogin);
             setError('');
           }}
         >
-          {isLogin 
-            ? "Don't have an account? Register" 
+          {isLogin
+            ? "Don't have an account? Register"
             : 'Already have an account? Login'}
         </button>
       </div>

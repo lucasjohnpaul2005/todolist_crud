@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Task } from '../../../domain/entities/Task';
+import { Pencil } from 'lucide-react';
 
 interface EditModalProps {
   isOpen: boolean;
@@ -39,7 +40,7 @@ export const EditModal: React.FC<EditModalProps> = ({ isOpen, todo, onSave, onCl
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3> Edit Task</h3>
+        <h3><Pencil size={18} /> Edit Task</h3>
         <div className="modal-field">
           <label>Task Name</label>
           <input

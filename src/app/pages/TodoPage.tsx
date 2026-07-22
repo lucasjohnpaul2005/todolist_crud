@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import {
   createTask,
@@ -12,17 +12,27 @@ import { EditModal } from '../components/todo/EditModal';
 import { Task } from '../../domain/entities/Task';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase/config';
+import {
+  Menu,
+  X,
+  Briefcase,
+  Home,
+  CheckCircle2,
+  Settings as SettingsIcon,
+  ClipboardList,
+  LogOut,
+  Plus,
+  Database,
+  HardDrive,
+  MemoryStick,
+  Flame,
+  Trash2,
+  BarChart3,
+} from 'lucide-react';
 
 export const TodoPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tasks, activeTab, isLoading, error, repositoryType } = useAppSelector((state) => state.tasks);
-
-  //  DEBUG: Log Redux state changes
-  useEffect(() => {
-    console.log(' TODO PAGE: Redux tasks:', tasks);
-    console.log(' TODO PAGE: Redux task IDs:', tasks.map(t => t.id));
-    console.log(' TODO PAGE: tasks count:', tasks.length);
-  }, [tasks]);
 
   // Sidebar state for mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -64,20 +74,23 @@ export const TodoPage: React.FC = () => {
 
   const filteredTodos = getFilteredTodos();
 
-  //  CREATE - Add Task with debug logs
+  const TAB_META = {
+    work: { label: 'Work Tasks', Icon: Briefcase },
+    personal: { label: 'Personal Tasks', Icon: Home },
+    completed: { label: 'Completed Tasks', Icon: CheckCircle2 },
+    settings: { label: 'Settings', Icon: SettingsIcon },
+  } as const;
+
+  // CREATE - Add Task
   const handleAddTodo = (): void => {
     if (newText.trim()) {
-      console.log(' handleAddTodo: Adding task:', newText.trim());
-      console.log(' handleAddTodo: Category:', newCategory);
-      console.log(' handleAddTodo: DueDate:', newDueDate);
-      
       dispatch(createTask({
         title: newText.trim(),
         category: newCategory,
         dueDate: newDueDate || new Date().toISOString().split('T')[0],
         workLocation: newCategory === 'Work' ? newWorkLocation : undefined,
       }));
-      
+
       setNewText('');
       setNewCategory('Personal');
       setNewWorkLocation('Work from Home');
@@ -86,54 +99,39 @@ export const TodoPage: React.FC = () => {
     }
   };
 
-  //  UPDATE - Toggle Complete with debug logs
+  // UPDATE - Toggle Complete
   const handleToggleComplete = (id: number): void => {
-    console.log(' handleToggleComplete: Called with ID:', id);
-    console.log(' handleToggleComplete: Current tasks in Redux:', tasks);
-    console.log(' handleToggleComplete: Task IDs:', tasks.map(t => t.id));
-    
     const task = tasks.find(t => t.id === id);
-    console.log(' handleToggleComplete: Found task:', task);
-    
+
     if (task) {
-      console.log(' handleToggleComplete: Toggling complete for:', task.title);
       dispatch(updateTask(id, { completed: !task.completed }));
     } else {
-      console.error(' handleToggleComplete: Task with ID', id, 'NOT found in Redux!');
-      console.log(' handleToggleComplete: Available IDs:', tasks.map(t => t.id));
+      console.error('handleToggleComplete: Task with ID', id, 'not found in Redux state');
     }
   };
 
   const openEditModal = (todo: Task): void => {
-    console.log(' openEditModal: Editing task:', todo);
     setEditingTodo(todo);
     setShowEditModal(true);
   };
 
-  //  UPDATE - Save Edit with debug logs
+  // UPDATE - Save Edit
   const handleSaveEdit = (id: number, updates: { title: string; dueDate: string; workLocation?: 'Work from Home' | 'Work from Company' }): void => {
-    console.log(' handleSaveEdit: Saving edit for ID:', id);
-    console.log(' handleSaveEdit: Updates:', updates);
     dispatch(updateTask(id, updates));
     setShowEditModal(false);
     setEditingTodo(null);
   };
 
-  //  DELETE - Delete Task with debug logs
+  // DELETE - Delete Task
   const handleDeleteTodo = (id: number): void => {
-    console.log(' handleDeleteTodo: Called with ID:', id);
-    console.log(' handleDeleteTodo: Available task IDs:', tasks.map(t => t.id));
-    
     const task = tasks.find(t => t.id === id);
-    console.log(' handleDeleteTodo: Found task:', task);
-    
+
     if (task?.workLocation === 'Work from Company') {
-      alert(' Cannot delete Company tasks!');
+      alert('Company tasks cannot be deleted.');
       return;
     }
-    
+
     if (window.confirm('Delete this task?')) {
-      console.log(' handleDeleteTodo: Deleting task ID:', id);
       dispatch(deleteTask(id));
     }
   };
@@ -141,7 +139,7 @@ export const TodoPage: React.FC = () => {
   const handleClearAll = (): void => {
     const hasCompanyTasks = tasks.some(t => t.workLocation === 'Work from Company');
     if (hasCompanyTasks) {
-      alert(' Cannot delete all tasks. Company tasks cannot be deleted.');
+      alert('Cannot delete all tasks — Company tasks cannot be deleted.');
       return;
     }
     if (window.confirm('Delete all tasks?')) {
@@ -152,7 +150,6 @@ export const TodoPage: React.FC = () => {
   };
 
   const handleSwitchRepository = (type: 'localStorage' | 'inMemory' | 'firebase'): void => {
-    console.log(' handleSwitchRepository: Switching to:', type);
     if (type === 'firebase' && !auth.currentUser) {
       alert('Please login first to use Firebase repository.');
       return;
@@ -165,7 +162,7 @@ export const TodoPage: React.FC = () => {
       <div className="app">
         <div className="sidebar">
           <div className="logo">
-            <h2> TodoList</h2>
+            <h2><ClipboardList size={22} /> TodoList</h2>
           </div>
         </div>
         <div className="main-content">
@@ -175,73 +172,82 @@ export const TodoPage: React.FC = () => {
     );
   }
 
+  const completedCount = tasks.filter(t => t.completed).length;
+  const pendingCount = tasks.filter(t => !t.completed).length;
+  const progressPercent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+
   return (
     <div className="app">
       {/* HAMBURGER MENU BUTTON - Mobile Only */}
-      <button 
+      <button
         className="menu-toggle"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         aria-label="Toggle sidebar"
+        aria-expanded={isSidebarOpen}
       >
-        ☰
+        {isSidebarOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
 
       {/* SIDEBAR */}
       <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <h2> TodoList</h2>
-          <button className="sidebar-close" onClick={() => setIsSidebarOpen(false)}>
-            ✕
+          <h2><ClipboardList size={22} /> TodoList</h2>
+          <button className="sidebar-close" onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
+            <X size={20} />
           </button>
         </div>
         <div className="logo">
-          <h2> TodoList</h2>
+          <h2><ClipboardList size={22} /> TodoList</h2>
         </div>
         <nav className="nav-menu">
-          <button 
+          <button
             className={`nav-item ${activeTab === 'work' ? 'active' : ''}`}
+            aria-current={activeTab === 'work' ? 'page' : undefined}
             onClick={() => {
               dispatch(setActiveTab('work'));
               setIsSidebarOpen(false);
             }}
           >
-            <span className="nav-icon"></span>
+            <span className="nav-icon"><Briefcase size={18} /></span>
             <span className="nav-text">Work Tasks</span>
             <span className="nav-count">{getCategoryCount('Work')}</span>
           </button>
-          
-          <button 
+
+          <button
             className={`nav-item ${activeTab === 'personal' ? 'active' : ''}`}
+            aria-current={activeTab === 'personal' ? 'page' : undefined}
             onClick={() => {
               dispatch(setActiveTab('personal'));
               setIsSidebarOpen(false);
             }}
           >
-            <span className="nav-icon"></span>
+            <span className="nav-icon"><Home size={18} /></span>
             <span className="nav-text">Personal Tasks</span>
             <span className="nav-count">{getCategoryCount('Personal')}</span>
           </button>
-          
-          <button 
+
+          <button
             className={`nav-item ${activeTab === 'completed' ? 'active' : ''}`}
+            aria-current={activeTab === 'completed' ? 'page' : undefined}
             onClick={() => {
               dispatch(setActiveTab('completed'));
               setIsSidebarOpen(false);
             }}
           >
-            <span className="nav-icon"></span>
+            <span className="nav-icon"><CheckCircle2 size={18} /></span>
             <span className="nav-text">Completed</span>
-            <span className="nav-count">{tasks.filter(t => t.completed).length}</span>
+            <span className="nav-count">{completedCount}</span>
           </button>
-          
-          <button 
+
+          <button
             className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+            aria-current={activeTab === 'settings' ? 'page' : undefined}
             onClick={() => {
               dispatch(setActiveTab('settings'));
               setIsSidebarOpen(false);
             }}
           >
-            <span className="nav-icon"></span>
+            <span className="nav-icon"><SettingsIcon size={18} /></span>
             <span className="nav-text">Settings</span>
           </button>
         </nav>
@@ -257,17 +263,23 @@ export const TodoPage: React.FC = () => {
         <div className="header">
           <div className="header-left">
             <h1>
-              {activeTab === 'work' && ' Work Tasks'}
-              {activeTab === 'personal' && ' Personal Tasks'}
-              {activeTab === 'completed' && ' Completed Tasks'}
-              {activeTab === 'settings' && ' Settings'}
+              {(() => {
+                const { Icon, label } = TAB_META[activeTab as keyof typeof TAB_META];
+                return (
+                  <>
+                    <Icon size={30} strokeWidth={2} />
+                    {label}
+                  </>
+                );
+              })()}
             </h1>
             <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
           <div className="header-right">
-            <span className="user-email"> {auth.currentUser?.email || 'User'}</span>
+            <span className="user-email">{auth.currentUser?.email || 'User'}</span>
             <button onClick={handleLogout} className="logout-btn">
-               Logout
+              <LogOut size={16} />
+              Logout
             </button>
           </div>
         </div>
@@ -280,29 +292,29 @@ export const TodoPage: React.FC = () => {
               <div className="stat-label">Total</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">{tasks.filter(t => t.completed).length}</div>
+              <div className="stat-number">{completedCount}</div>
               <div className="stat-label">Done</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">{tasks.filter(t => !t.completed).length}</div>
+              <div className="stat-number">{pendingCount}</div>
               <div className="stat-label">Pending</div>
             </div>
           </div>
           <div className="progress-section">
             <div className="progress-header">
               <span>Progress</span>
-              <span>{tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%</span>
+              <span>{progressPercent}%</span>
             </div>
             <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%` }}
+              <div
+                className="progress-fill"
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
           </div>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message" role="alert" aria-live="polite">{error}</div>}
 
         {activeTab !== 'settings' ? (
           <>
@@ -315,7 +327,8 @@ export const TodoPage: React.FC = () => {
 
             {!showAddForm ? (
               <button onClick={() => setShowAddForm(true)} className="add-task-btn">
-                + Add New Task
+                <Plus size={18} />
+                Add New Task
               </button>
             ) : (
               <div className="add-form">
@@ -332,8 +345,8 @@ export const TodoPage: React.FC = () => {
                   onChange={(e) => setNewCategory(e.target.value as 'Work' | 'Personal')}
                   className="add-select"
                 >
-                  <option value="Work"> Work</option>
-                  <option value="Personal"> Personal</option>
+                  <option value="Work">Work</option>
+                  <option value="Personal">Personal</option>
                 </select>
                 {newCategory === 'Work' && (
                   <select
@@ -341,8 +354,8 @@ export const TodoPage: React.FC = () => {
                     onChange={(e) => setNewWorkLocation(e.target.value as 'Work from Home' | 'Work from Company')}
                     className="add-select"
                   >
-                    <option value="Work from Home"> Work from Home</option>
-                    <option value="Work from Company"> Work from Company</option>
+                    <option value="Work from Home">Work from Home</option>
+                    <option value="Work from Company">Work from Company</option>
                   </select>
                 )}
                 <input
@@ -352,7 +365,9 @@ export const TodoPage: React.FC = () => {
                   className="add-input"
                 />
                 <div className="add-buttons">
-                  <button onClick={handleAddTodo} className="save-add-btn">Add Task</button>
+                  <button onClick={handleAddTodo} className="save-add-btn" disabled={!newText.trim()}>
+                    Add Task
+                  </button>
                   <button onClick={() => setShowAddForm(false)} className="cancel-add-btn">Cancel</button>
                 </div>
               </div>
@@ -361,37 +376,37 @@ export const TodoPage: React.FC = () => {
         ) : (
           <div className="settings-panel">
             <div className="settings-section">
-              <h3> Data Repository</h3>
+              <h3><Database size={18} /> Data Repository</h3>
               <div className="repository-switch">
                 <button
                   className={`repo-btn ${repositoryType === 'localStorage' ? 'active' : ''}`}
                   onClick={() => handleSwitchRepository('localStorage')}
                 >
-                   Local Storage
+                  <HardDrive size={16} /> Local Storage
                 </button>
                 <button
                   className={`repo-btn ${repositoryType === 'inMemory' ? 'active' : ''}`}
                   onClick={() => handleSwitchRepository('inMemory')}
                 >
-                   In Memory
+                  <MemoryStick size={16} /> In Memory
                 </button>
                 <button
                   className={`repo-btn ${repositoryType === 'firebase' ? 'active' : ''}`}
                   onClick={() => handleSwitchRepository('firebase')}
                 >
-                   Firebase
+                  <Flame size={16} /> Firebase
                 </button>
               </div>
-              <p style={{ marginTop: '12px', fontSize: '13px', color: '#666' }}>
+              <p className="repo-status-text">
                 Current: <strong>
-                  {repositoryType === 'localStorage' && ' Local Storage'}
-                  {repositoryType === 'inMemory' && ' In Memory'}
-                  {repositoryType === 'firebase' && ' Firebase'}
+                  {repositoryType === 'localStorage' && 'Local Storage'}
+                  {repositoryType === 'inMemory' && 'In Memory'}
+                  {repositoryType === 'firebase' && 'Firebase'}
                 </strong>
               </p>
               {repositoryType === 'firebase' && (
-                <p style={{ marginTop: '8px', fontSize: '12px', color: '#28a745' }}>
-                   Connected to Firebase Cloud
+                <p className="repo-connected-text">
+                  <CheckCircle2 size={14} /> Connected to Firebase Cloud
                 </p>
               )}
             </div>
@@ -399,16 +414,16 @@ export const TodoPage: React.FC = () => {
             <div className="settings-section">
               <h3>Data Management</h3>
               <button onClick={handleClearAll} className="danger-btn">
-                 Delete All Tasks
+                <Trash2 size={16} /> Delete All Tasks
               </button>
             </div>
 
             <div className="settings-section">
-              <h3> Statistics</h3>
+              <h3><BarChart3 size={18} /> Statistics</h3>
               <div className="stats-grid">
                 <div className="stat-card"><div className="stat-number">{tasks.length}</div><div className="stat-label">Total</div></div>
-                <div className="stat-card"><div className="stat-number">{tasks.filter(t => t.completed).length}</div><div className="stat-label">Done</div></div>
-                <div className="stat-card"><div className="stat-number">{tasks.filter(t => !t.completed).length}</div><div className="stat-label">Pending</div></div>
+                <div className="stat-card"><div className="stat-number">{completedCount}</div><div className="stat-label">Done</div></div>
+                <div className="stat-card"><div className="stat-number">{pendingCount}</div><div className="stat-label">Pending</div></div>
                 <div className="stat-card"><div className="stat-number">{tasks.filter(t => t.category === 'Work' && !t.completed).length}</div><div className="stat-label">Work</div></div>
                 <div className="stat-card"><div className="stat-number">{tasks.filter(t => t.category === 'Personal' && !t.completed).length}</div><div className="stat-label">Personal</div></div>
               </div>
